@@ -16,6 +16,28 @@
     --coral: #ff6b4a;
     --text: #f4eef0;
     --text-dim: #b8a8b6;
+    --glow: rgba(212,255,61,0.55);
+    --primary-btn-text: #1a1119;
+    --accent-btn-text: #1a1119;
+  }
+
+  body.light-theme {
+    --bg: #fbf8f6;
+    --panel: #efe6e2;
+    --panel-line: #d9c9c2;
+    --lime: #7a3ea1;
+    --coral: #c8432a;
+    --text: #241623;
+    --text-dim: #7d6b74;
+    --glow: rgba(122,62,161,0.35);
+    --primary-btn-text: #fbf8f6;
+    --accent-btn-text: #fbf8f6;
+  }
+
+  body { transition: background 200ms ease, color 200ms ease; }
+  .beat-dot, .pendulum-arm, .pendulum-weight, .step-btn, input[type="range"],
+  button.pill, select {
+    transition: background 200ms ease, border-color 200ms ease, color 200ms ease, transform 100ms ease;
   }
 
   * { box-sizing: border-box; }
@@ -138,7 +160,7 @@
     border-radius: 50%;
     background: var(--lime);
     transform: translateX(-50%);
-    box-shadow: 0 0 18px rgba(212,255,61,0.55);
+    box-shadow: 0 0 18px var(--glow);
   }
 
   .middle {
@@ -191,7 +213,7 @@
     border-radius: 50%;
     background: var(--lime);
     cursor: pointer;
-    box-shadow: 0 0 10px rgba(212,255,61,0.5);
+    box-shadow: 0 0 10px var(--glow);
   }
   input[type="range"]::-moz-range-thumb {
     width: 20px;
@@ -228,14 +250,14 @@
 
   button.pill.primary {
     background: var(--lime);
-    color: #1a1119;
+    color: var(--primary-btn-text);
     border-color: var(--lime);
   }
   button.pill.primary:hover { border-color: var(--lime); }
 
   button.pill.active-toggle {
     background: var(--coral);
-    color: #1a1119;
+    color: var(--accent-btn-text);
     border-color: var(--coral);
   }
 
@@ -299,6 +321,7 @@
         <option value="6">6/8</option>
       </select>
       <button class="pill" id="accentBtn">Accent: On</button>
+      <button class="pill" id="themeBtn">Light background</button>
     </div>
 
     <div class="bottom-label">Tap the tempo button a few times to match a beat, or drag the slider</div>
@@ -314,6 +337,7 @@
   const tapBtn = document.getElementById('tapBtn');
   const timeSigSelect = document.getElementById('timeSig');
   const accentBtn = document.getElementById('accentBtn');
+  const themeBtn = document.getElementById('themeBtn');
   const beatRow = document.getElementById('beatRow');
   const pendulumArm = document.getElementById('pendulumArm');
 
@@ -481,6 +505,24 @@
       playBtn.click();
     }
   });
+
+  // Theme toggle
+  function applyTheme(isLight) {
+    document.body.classList.toggle('light-theme', isLight);
+    themeBtn.textContent = isLight ? 'Dark background' : 'Light background';
+  }
+
+  themeBtn.addEventListener('click', () => {
+    const goingLight = !document.body.classList.contains('light-theme');
+    applyTheme(goingLight);
+    try { localStorage.setItem('metronomeTheme', goingLight ? 'light' : 'dark'); } catch (e) {}
+  });
+
+  (function loadSavedTheme() {
+    let saved = null;
+    try { saved = localStorage.getItem('metronomeTheme'); } catch (e) {}
+    if (saved === 'light') applyTheme(true);
+  })();
 
   buildBeatDots();
   updateBpmDisplay();
